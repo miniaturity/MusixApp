@@ -7,12 +7,19 @@ electron.contextBridge.exposeInMainWorld("electron", {
         })
     },
     getStaticData: () => ipcInvoke("getStaticData"),
+    
+    // MP3 functions
+    selectMP3Folder: () => ipcInvoke("selectMP3Folder"),
+    getCurrentMP3Folder: () => ipcInvoke("getCurrentMP3Folder"),
+    scanMP3Folder: (folderPath?: string) => ipcInvoke("scanMP3Folder", folderPath),
+    getMP3FileBuffer: (fileId: string) => ipcInvoke("getMP3FileBuffer", fileId),
 } satisfies Window['electron'])
 
 function ipcInvoke<Key extends keyof EventPayloadMapping>(
-  key: Key
+  key: Key,
+  ...args: any[]
 ): Promise<EventPayloadMapping[Key]> {
-  return electron.ipcRenderer.invoke(key);
+  return electron.ipcRenderer.invoke(key, ...args);
 }
 
 function ipcOn<Key extends keyof EventPayloadMapping>(
