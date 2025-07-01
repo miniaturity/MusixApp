@@ -27,6 +27,11 @@ type MP3Folder = {
     files: MP3File[];
 };
 
+type AlbumArtData = {
+    format: string;
+    data: number[];
+} | null;
+
 type EventPayloadMapping = {
     statistics: Statistics;
     getStaticData: StaticData;
@@ -34,6 +39,7 @@ type EventPayloadMapping = {
     getCurrentMP3Folder: MP3Folder | null;
     scanMP3Folder: MP3File[];
     getMP3FileBuffer: number[];
+    getAlbumArt: AlbumArtData;
 };
 
 type UnsubscribeFunction = () => void;
@@ -46,5 +52,6 @@ interface Window {
         getCurrentMP3Folder: () => Promise<MP3Folder | null>;
         scanMP3Folder: (folderPath?: string) => Promise<MP3File[]>;
         getMP3FileBuffer: (fileId: string) => Promise<number[]>;
+        getAlbumArt: (fileId: string) => Promise<AlbumArtData>;
     }
 }

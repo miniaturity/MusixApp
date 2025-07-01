@@ -1,6 +1,7 @@
 // src/ui/pages/MP3PlayerPage.tsx
 import React, { useEffect, useState } from 'react';
 import { Player } from '../components/Player';
+import './PlayerPage.css'
 
 export const MP3PlayerPage: React.FC = () => {
   const [mp3Folder, setMp3Folder] = useState<MP3Folder | null>(null);
@@ -32,7 +33,7 @@ export const MP3PlayerPage: React.FC = () => {
       if (folderPath) {
         const folder = await window.electron.getCurrentMP3Folder();
         setMp3Folder(folder);
-        // Reset selection when folder changes
+        // Reset selection when folder changes!
         setSelectedFile(null);
         setCurrentPlayingIndex(-1);
       }
@@ -90,106 +91,14 @@ export const MP3PlayerPage: React.FC = () => {
 
   return (
     <div className="page">
-      <div className="page-header">
-        <h1>MP3 Player</h1>
-        <div className="page-actions">
-          <button onClick={selectFolder} disabled={isLoading}>
-            {isLoading ? 'Loading...' : 'Select Folder'}
-          </button>
-          {mp3Folder && (
-            <button onClick={refreshFolder} disabled={isLoading}>
-              🔄 Refresh
-            </button>
-          )}
-        </div>
-      </div>
+    
+      <Player 
+        file={selectedFile}
+        folder={mp3Folder}
+        last={playPrevious}
+        next={playNext}
+      />
 
-      {mp3Folder && (
-        <div className="folder-info">
-          <h3>📁 {mp3Folder.path}</h3>
-          <p>{mp3Folder.files.length} MP3 files found</p>
-        </div>
-      )}
-
-      <div className="player-layout">
-        {selectedFile ? (
-          <div className="player-section">
-            <div className="player-controls">
-              <button 
-                onClick={playPrevious} 
-                disabled={currentPlayingIndex <= 0}
-                className="nav-button"
-              >
-                ⏮️ Previous
-              </button>
-              <button 
-                onClick={playNext} 
-                disabled={!mp3Folder || currentPlayingIndex >= mp3Folder.files.length - 1}
-                className="nav-button"
-              >
-                Next ⏭️
-              </button>
-            </div>
-            <Player 
-              file={selectedFile} 
-              onEnded={playNext}
-            />
-          </div>
-        ) : (
-          <div className="no-selection">
-            <div className="no-selection-content">
-              <span className="no-selection-icon">🎵</span>
-              <h3>No song selected</h3>
-              <p>Choose a song from the list to start playing</p>
-            </div>
-          </div>
-        )}
-
-        {mp3Folder ? (
-          <div className="file-list">
-            <div className="file-list-header">
-              <h3>Songs ({mp3Folder.files.length})</h3>
-            </div>
-            <div className="file-list-container">
-              {mp3Folder.files.map((file, index) => (
-                <div 
-                  key={file.id} 
-                  className={`file-item ${index === currentPlayingIndex ? 'playing' : ''}`}
-                  onClick={() => playFile(file, index)}
-                >
-                  <div className="file-main-info">
-                    <div className="file-title">
-                      {file.title || file.filename}
-                    </div>
-                    <div className="file-details">
-                      {file.artist && <span className="file-artist">{file.artist}</span>}
-                      {file.album && <span className="file-album">• {file.album}</span>}
-                    </div>
-                  </div>
-                  <div className="file-meta">
-                    <span className="duration">{formatDuration(file.duration)}</span>
-                    <span className="size">{formatFileSize(file.size)}</span>
-                    {index === currentPlayingIndex && (
-                      <span className="playing-indicator">♪</span>
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        ) : (
-          <div className="empty-state">
-            <div className="empty-state-content">
-              <span className="empty-state-icon">📂</span>
-              <h3>No folder selected</h3>
-              <p>Select a folder containing MP3 files to get started</p>
-              <button onClick={selectFolder} className="primary-button">
-                Select MP3 Folder
-              </button>
-            </div>
-          </div>
-        )}
-      </div>
     </div>
   );
 };

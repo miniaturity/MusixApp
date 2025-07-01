@@ -10,6 +10,10 @@ export interface MP3File {
   title?: string;
   artist?: string;
   album?: string;
+  albumArt?: {
+    format: string;
+    data: Buffer;
+  }
   duration?: number;
   size: number;
   lastModified: Date;
@@ -89,6 +93,14 @@ export class MP3Manager {
       mp3File.artist = metadata.common.artist;
       mp3File.album = metadata.common.album;
       mp3File.duration = metadata.format.duration;
+
+      if (metadata.common.picture && metadata.common.picture.length > 0) {
+        const picture = metadata.common.picture[0];
+        mp3File.albumArt = {
+          format: picture.format,
+          data: Buffer.from(picture.data)
+        };
+      } 
     } catch (error) {
       console.warn(`Could not extract metadata for ${filename}:`, error);
     }
@@ -122,5 +134,13 @@ export class MP3Manager {
     }
 
     return fs.promises.readFile(file.filepath);
+  }
+
+  getAlbumArt(id: string): { format: string; data: Buffer } | null {
+    const file = this.getFileById(id);
+    if (!file || !file.albumArt) {
+      return null;
+    }
+    return file.albumArt;
   }
 }

@@ -13,6 +13,7 @@ electron.contextBridge.exposeInMainWorld("electron", {
     getCurrentMP3Folder: () => ipcInvoke("getCurrentMP3Folder"),
     scanMP3Folder: (folderPath?: string) => ipcInvoke("scanMP3Folder", folderPath),
     getMP3FileBuffer: (fileId: string) => ipcInvoke("getMP3FileBuffer", fileId),
+    getAlbumArt: (fileId: string) => ipcInvoke("getAlbumArt", fileId),
 } satisfies Window['electron'])
 
 function ipcInvoke<Key extends keyof EventPayloadMapping>(
