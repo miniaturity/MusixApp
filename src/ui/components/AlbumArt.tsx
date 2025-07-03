@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import defaultAlbumArt from '../assets/m6.png';
 
 interface AlbumArtProps {
 	fileId: string | null;
@@ -13,7 +14,7 @@ export const AlbumArt: React.FC<AlbumArtProps> = ({
 	alt = "Album Art",
 	className,
 	style,
-	fallbackSrc = "assets/m6.png"
+	fallbackSrc = defaultAlbumArt
 }) => {
 	const [imageSrc, setImageSrc] = useState<string>(fallbackSrc);
 	const [isLoading, setIsLoading] = useState(true);
@@ -90,10 +91,7 @@ export const AlbumArt: React.FC<AlbumArtProps> = ({
 							alt={alt}
 							className={`aa-loading-img`}
 							style={{
-								width: '100%',
-								height: '100%',
-								objectFit: 'cover',
-								display: isLoading ? 'block' : 'none'
+								display: isLoading ? '' : 'none'
 							}}
 						/>
 					</div>
@@ -102,12 +100,9 @@ export const AlbumArt: React.FC<AlbumArtProps> = ({
 					src={imageSrc}
 					alt={alt}
 					onError={handleImageError}
-					className={`aa-img ${isLoading ? 'loading' : ''}`}
+					className={`aa-img`}
 					style={{
-						width: '100%',
-						height: '100%',
-						objectFit: 'cover',
-						display: isLoading ? 'none' : 'block'
+						display: isLoading ? 'none' : ''
 					}}
 				/>
 			</div>

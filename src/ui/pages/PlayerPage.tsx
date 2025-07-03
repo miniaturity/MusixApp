@@ -8,10 +8,14 @@ export const MP3PlayerPage: React.FC = () => {
   const [selectedFile, setSelectedFile] = useState<MP3File | null>(null);
   const [currentPlayingIndex, setCurrentPlayingIndex] = useState<number>(-1);
   const [isLoading, setIsLoading] = useState(false);
+  const [hasMounted, setHasMounted] = useState(false);
 
   useEffect(() => {
-    // Load current folder on page load
-    loadCurrentFolder();
+    if (!hasMounted) {
+      console.log("Loading folder.")
+      loadCurrentFolder();
+      setHasMounted(true);
+    }
   }, []);
 
   const loadCurrentFolder = async () => {
@@ -33,9 +37,13 @@ export const MP3PlayerPage: React.FC = () => {
       if (folderPath) {
         const folder = await window.electron.getCurrentMP3Folder();
         setMp3Folder(folder);
-        // Reset selection when folder changes!
-        setSelectedFile(null);
-        setCurrentPlayingIndex(-1);
+        if (folder?.files && folder?.files.length > 0) {
+          setSelectedFile(folder.files[0]);
+          setCurrentPlayingIndex(0);
+        } else {
+          setSelectedFile(null);
+          setCurrentPlayingIndex(-1);
+        }
       }
     } catch (error) {
       console.error('Error selecting folder:', error);
@@ -64,17 +72,31 @@ export const MP3PlayerPage: React.FC = () => {
   };
 
   const playNext = () => {
-    if (mp3Folder && currentPlayingIndex < mp3Folder.files.length - 1) {
-      const nextIndex = currentPlayingIndex + 1;
-      playFile(mp3Folder.files[nextIndex], nextIndex);
+    if (!mp3Folder || mp3Folder.files.length === 0) return;
+    
+    const nextIndex = (currentPlayingIndex + 1) % mp3Folder.files.length; // Loop back to start
+    const nextFile = mp3Folder.files[nextIndex];
+    
+    if (nextFile) {
+      playFile(nextFile, nextIndex);
     }
   };
 
   const playPrevious = () => {
-    if (mp3Folder && currentPlayingIndex > 0) {
-      const prevIndex = currentPlayingIndex - 1;
-      playFile(mp3Folder.files[prevIndex], prevIndex);
+    if (!mp3Folder || mp3Folder.files.length === 0) return;
+    
+    const prevIndex = currentPlayingIndex <= 0 
+      ? mp3Folder.files.length - 1  // Loop to end
+      : currentPlayingIndex - 1;
+    const prevFile = mp3Folder.files[prevIndex];
+    
+    if (prevFile) {
+      playFile(prevFile, prevIndex);
     }
+  };
+
+  const handleTrackEnded = () => {
+    playNext();
   };
 
   const formatFileSize = (bytes: number): string => {
@@ -97,6 +119,9 @@ export const MP3PlayerPage: React.FC = () => {
         folder={mp3Folder}
         last={playPrevious}
         next={playNext}
+        onEnded={handleTrackEnded}
+        selectFolder={selectFolder}
+        selectFile={playFile}
       />
 
     </div>
