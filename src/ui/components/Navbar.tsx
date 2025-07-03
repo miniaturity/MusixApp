@@ -11,6 +11,10 @@ export const NavBar: React.FC<NavBarProps> = ({
 		{
 			icon: "♪",
 			nav: "/"
+		},
+		{
+			icon: "◉",
+			nav: "/s"
 		}
 	]
 	const navigate = useNavigate();
@@ -18,14 +22,14 @@ export const NavBar: React.FC<NavBarProps> = ({
 
 	return (
 		<>
-			<footer className="navbar">
+			<div className="navbar">
 					{buttons.map((button) => (<button 
 					className={`navbar-button${currentPath === button.nav ? '-current' : ''}`}
 					onClick={() => navigate(button.nav)}
 					>
 						{button.icon}
 					</button>))}
-			</footer>
+			</div>
 		</>
 	)
 }

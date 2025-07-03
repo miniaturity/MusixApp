@@ -5,12 +5,8 @@ import './PlayerPage.css'
 import '../App.css'
 import { NavBar } from '../components/Navbar';
 
-interface MP3PlayerPageProps {
-  path: string
-}
 
-
-export const MP3PlayerPage: React.FC<MP3PlayerPageProps> = ({ path }) => {
+export const MP3PlayerPage: React.FC = () => {
   const [mp3Folder, setMp3Folder] = useState<MP3Folder | null>(null);
   const [selectedFile, setSelectedFile] = useState<MP3File | null>(null);
   const [currentPlayingIndex, setCurrentPlayingIndex] = useState<number>(-1);
@@ -127,10 +123,6 @@ export const MP3PlayerPage: React.FC<MP3PlayerPageProps> = ({ path }) => {
         selectFolder={selectFolder}
         selectFile={playFile}
         refreshFolder={refreshFolder}
-      />
-
-      <NavBar 
-        currentPath={path}
       />
 
     </div>

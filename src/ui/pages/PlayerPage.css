@@ -390,6 +390,7 @@ body {
 
 .button-fs:hover {
   color: var(--primary-color);
+  background-color: var(--hover-bg-color);
 }
 
 .mq-list {
