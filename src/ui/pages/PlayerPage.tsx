@@ -1,5 +1,5 @@
 // src/ui/pages/MP3PlayerPage.tsx
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Player } from '../components/Player';
 import './PlayerPage.css'
 
@@ -66,23 +66,24 @@ export const MP3PlayerPage: React.FC = () => {
     }
   };
 
-  const playFile = (file: MP3File, index: number) => {
+  const playFile = (file: MP3File, index: number, seek: (num: number) => void) => {
+    seek(0);
     setSelectedFile(file);
     setCurrentPlayingIndex(index);
   };
 
-  const playNext = () => {
+  const playNext = (seek: (num: number) => void) => {
     if (!mp3Folder || mp3Folder.files.length === 0) return;
     
     const nextIndex = (currentPlayingIndex + 1) % mp3Folder.files.length; // Loop back to start
     const nextFile = mp3Folder.files[nextIndex];
     
     if (nextFile) {
-      playFile(nextFile, nextIndex);
+      playFile(nextFile, nextIndex, () => seek(0));
     }
   };
 
-  const playPrevious = () => {
+  const playPrevious = (seek: (num: number) => void) => {
     if (!mp3Folder || mp3Folder.files.length === 0) return;
     
     const prevIndex = currentPlayingIndex <= 0 
@@ -91,13 +92,10 @@ export const MP3PlayerPage: React.FC = () => {
     const prevFile = mp3Folder.files[prevIndex];
     
     if (prevFile) {
-      playFile(prevFile, prevIndex);
+      playFile(prevFile, prevIndex, () => seek(0));
     }
   };
 
-  const handleTrackEnded = () => {
-    playNext();
-  };
 
   const formatFileSize = (bytes: number): string => {
     const mb = bytes / (1024 * 1024);
@@ -119,9 +117,9 @@ export const MP3PlayerPage: React.FC = () => {
         folder={mp3Folder}
         last={playPrevious}
         next={playNext}
-        onEnded={handleTrackEnded}
         selectFolder={selectFolder}
         selectFile={playFile}
+        refreshFolder={refreshFolder}
       />
 
     </div>

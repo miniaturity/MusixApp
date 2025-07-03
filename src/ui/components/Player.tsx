@@ -1,16 +1,16 @@
-// src/ui/components/MP3Player.tsx
-import React, { useState, useRef, useEffect, useCallback } from 'react';
+import React, { useState, useRef, useEffect, useCallback, SetStateAction, Dispatch } from 'react';
 import { AlbumArt } from './AlbumArt';
 import { MiniQueue } from './MiniQueue';
 
 interface MP3PlayerProps {
 	file: MP3File | null;
-	onEnded?: () => void;
-	last: () => void;
-	next: () => void;
+	onEnded?: (seek: (num: number) => void, repeatMode: number) => void;
+	last: (seek: (num: number) => void) => void;
+	next: (seek: (num: number) => void) => void;
 	folder: MP3Folder | null;
 	selectFolder: () => void;
-	selectFile: (file: MP3File, index: number) => void;
+	selectFile: (file: MP3File, index: number, seek: (num: number) => void) => void;
+	refreshFolder: () => void;
 }
 
 const audioElementCache = new Map<string, HTMLAudioElement>();
@@ -18,17 +18,14 @@ const MAX_CACHE_SIZE = 5;
 const cacheOrder: string[] = [];
 
 const addToCache = (fileId: string, audio: HTMLAudioElement) => {
-	// Remove if already exists
 	const existingIndex = cacheOrder.indexOf(fileId);
 	if (existingIndex !== -1) {
 		cacheOrder.splice(existingIndex, 1);
 	}
 
-	// Add to front
 	cacheOrder.unshift(fileId);
 	audioElementCache.set(fileId, audio);
 
-	// Evict oldest if cache is full
 	if (cacheOrder.length > MAX_CACHE_SIZE) {
 		const oldestFileId = cacheOrder.pop()!;
 		const oldAudio = audioElementCache.get(oldestFileId);
@@ -60,17 +57,21 @@ export const Player: React.FC<MP3PlayerProps> = ({
 	last,
 	selectFolder,
 	selectFile,
+	refreshFolder,
 }) => {
-	const [isPlaying, setIsPlaying] = useState(false);
-	const [currentTime, setCurrentTime] = useState(0);
-	const [duration, setDuration] = useState(0);
-	const [volume, setVolume] = useState(1);
-	const [isLoading, setIsLoading] = useState(false);
-	const [loadProgress, setLoadProgress] = useState(0);
+	const [isPlaying, setIsPlaying] = useState<boolean>(false);
+	const [currentTime, setCurrentTime] = useState<number>(0);
+	const [duration, setDuration] = useState<number>(0);
+	const [volume, setVolume] = useState<number>(1);
+	const [isLoading, setIsLoading] = useState<boolean>(false);
+	const [loadProgress, setLoadProgress] = useState<number>(0);
+	const [repeatMode, setRepeatMode] = useState<number>(0);
+
 
 	const audioRef = useRef<HTMLAudioElement | null>(null);
 	const currentFileIdRef = useRef<string | null>(null);
 	const preloadingRef = useRef<Set<string>>(new Set());
+	const shouldAutoPlayRef = useRef<boolean>(false);
 
 	useEffect(() => {
 		return () => {
@@ -102,7 +103,7 @@ export const Player: React.FC<MP3PlayerProps> = ({
 		audio.preload = 'auto';
 		audio.volume = volume;
 
-		// Get file buffer and create blob URL - this is much faster than AudioContext
+		// Get file buffer and create blob URL - this is very much faster than AudioContext
 		const bufferArray = await window.electron.getMP3FileBuffer(fileId);
 		const blob = new Blob([new Uint8Array(bufferArray)], { type: 'audio/mpeg' });
 		const audioUrl = URL.createObjectURL(blob);
@@ -122,6 +123,12 @@ export const Player: React.FC<MP3PlayerProps> = ({
 		setLoadProgress(0);
 
 		try {
+			// Stop current audio if playing
+			if (audioRef.current) {
+				audioRef.current.pause();
+				setIsPlaying(false);
+			}
+
 			const audio = await createAudioElement(file.id);
 			
 			// Set up event listeners
@@ -130,6 +137,12 @@ export const Player: React.FC<MP3PlayerProps> = ({
 				setCurrentTime(audio.currentTime);
 				setIsLoading(false);
 				setLoadProgress(100);
+				
+				// Auto-play if requested (for next/previous navigation)
+				if (shouldAutoPlayRef.current) {
+					shouldAutoPlayRef.current = false;
+					play();
+				}
 			};
 
 			const handleTimeUpdate = () => {
@@ -137,9 +150,14 @@ export const Player: React.FC<MP3PlayerProps> = ({
 			};
 
 			const handleEnded = () => {
-				setIsPlaying(false);
-				onEnded?.();
-				next?.(); // Auto-advance to next track
+				if (repeatMode === 0) {
+					setIsPlaying(false);
+					shouldAutoPlayRef.current = true;
+					next?.(() => seek(0)); // Auto-advance to next track
+				} else if (repeatMode === 1) {					
+					seek(0);
+					play();
+				}
 			};
 
 			const handleProgress = () => {
@@ -152,6 +170,12 @@ export const Player: React.FC<MP3PlayerProps> = ({
 
 			const handleCanPlay = () => {
 				setIsLoading(false);
+				
+				// Auto-play if requested and not already handled by loadedmetadata
+				if (shouldAutoPlayRef.current && audio.readyState >= 3) {
+					shouldAutoPlayRef.current = false;
+					play();
+				}
 			};
 
 			// Remove old listeners if they exist
@@ -184,6 +208,7 @@ export const Player: React.FC<MP3PlayerProps> = ({
 		} catch (error) {
 			console.error('Error loading audio file:', error);
 			setIsLoading(false);
+			shouldAutoPlayRef.current = false; // Reset on error
 		}
 	};
 
@@ -258,19 +283,24 @@ export const Player: React.FC<MP3PlayerProps> = ({
 	};
 
 	const handleNext = () => {
+		console.log(currentTime);
 		stop();
-		setTimeout(() => {
-			next?.();
-			play();
-		}, 50);
+		shouldAutoPlayRef.current = true;
+		next?.(() => seek(0));
 	};
 
 	const handlePrevious = () => {
-		last?.();
+		if (currentTime < 5) {
+			stop();
+			shouldAutoPlayRef.current = true;
+			last?.(() => seek(0));
+		} else {
+			seek(0);
+		}
 	};
 
 	const formatFileName = (n: string): string => {
-		return n.split('.')[0];
+		return n.split('.')[0].slice(0, 30);
 	}
 
 	const formatTime = (time: number): string => {
@@ -283,6 +313,9 @@ export const Player: React.FC<MP3PlayerProps> = ({
 		if (!file || !folder) return 0;
 		return folder.files.findIndex(f => f.id === file.id) + 1;
 	};
+
+
+
 
 	return (
 		<div className="player">
@@ -306,12 +339,15 @@ export const Player: React.FC<MP3PlayerProps> = ({
 				</div>
 
 				<div className="right">
+				
 					<MiniQueue 
 						selectedFolder={folder}
 						selectedFile={file}
 						selectFile={selectFile}
-						isLoading={isLoading}
 						selectFolder={selectFolder}
+						isLoading={isLoading}
+						refreshFolder={refreshFolder}
+						seek={seek}
 					/>
 				</div>
 			</div>
@@ -328,30 +364,47 @@ export const Player: React.FC<MP3PlayerProps> = ({
 							max={duration}
 							value={currentTime}
 							onChange={(e) => seek(Number(e.target.value))}
-							className="progress-bar"
 						/>
+						
 					</div>
 				</div>
-
-				<div className="controls">
-					<button 
-						className="last"
-						onClick={handlePrevious}
-					>
-						{"◁"}
-					</button>
-					<button
-						className="pause"
-						onClick={isPlaying ? pause : play}
-					>
-						{isPlaying ? "❚❚" : "▶"}
-					</button>
-					<button
-						className="next"
-						onClick={handleNext}
-					>
-						{"▷"}
-					</button>
+				<div className="cp-container">
+					<div className="controls">
+						<button className="last" style={{visibility: 'hidden'}}>
+							{"."}
+						</button>
+						<button 
+							className="last"
+							onClick={handlePrevious}
+						>
+							{"◁"}
+						</button>
+						<button
+							className="pause"
+							onClick={isPlaying ? pause : play}
+						>
+							{isPlaying ? "❚❚" : "▶"}
+						</button>
+						<button
+							className="next"
+							onClick={handleNext}
+						>
+							{"▷"}
+						</button>
+						<button
+							className="repeat"
+							onClick={() => {
+								const newMode: number = repeatMode === 0 ? 1 : 0
+								setRepeatMode(newMode);
+								console.log(newMode);
+							}}
+							style={{
+								color: `${repeatMode === 0 ? 'var(--text-color)' : 'var(--primary-color)'}`
+							}}
+						>
+							{"↻"}
+						</button>
+					</div>
 				</div>
 			</div>
 
