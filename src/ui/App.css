@@ -18,7 +18,6 @@
 .navbar {
 	display: flex;
 	flex-direction: row;
-	align-items: center;
 	border: 1px cyan solid;
-	height: 8%;
+	height: 50px;
 }

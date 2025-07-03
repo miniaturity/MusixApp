@@ -3,6 +3,7 @@ import { AlbumArt } from './AlbumArt';
 import { MiniQueue } from './MiniQueue';
 import { IconContext } from "react-icons"
 import { BiColor, BiColorFill, BiSolidVolumeFull } from "react-icons/bi";
+import { NavBar } from './Navbar';
 
 interface MP3PlayerProps {
 	file: MP3File | null;
@@ -438,7 +439,7 @@ export const Player: React.FC<MP3PlayerProps> = ({
 					</div>
 				</div>
 			</div>
-
+			
 		</div>
 	);
 };

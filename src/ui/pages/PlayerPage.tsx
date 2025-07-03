@@ -2,6 +2,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Player } from '../components/Player';
 import './PlayerPage.css'
+import '../App.css'
 import { NavBar } from '../components/Navbar';
 
 interface MP3PlayerPageProps {
