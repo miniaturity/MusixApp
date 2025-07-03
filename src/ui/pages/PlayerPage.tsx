@@ -2,8 +2,14 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Player } from '../components/Player';
 import './PlayerPage.css'
+import { NavBar } from '../components/Navbar';
 
-export const MP3PlayerPage: React.FC = () => {
+interface MP3PlayerPageProps {
+  path: string
+}
+
+
+export const MP3PlayerPage: React.FC<MP3PlayerPageProps> = ({ path }) => {
   const [mp3Folder, setMp3Folder] = useState<MP3Folder | null>(null);
   const [selectedFile, setSelectedFile] = useState<MP3File | null>(null);
   const [currentPlayingIndex, setCurrentPlayingIndex] = useState<number>(-1);
@@ -120,6 +126,10 @@ export const MP3PlayerPage: React.FC = () => {
         selectFolder={selectFolder}
         selectFile={playFile}
         refreshFolder={refreshFolder}
+      />
+
+      <NavBar 
+        currentPath={path}
       />
 
     </div>

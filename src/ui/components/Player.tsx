@@ -1,6 +1,8 @@
-import React, { useState, useRef, useEffect, useCallback, SetStateAction, Dispatch } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { AlbumArt } from './AlbumArt';
 import { MiniQueue } from './MiniQueue';
+import { IconContext } from "react-icons"
+import { BiColor, BiColorFill, BiSolidVolumeFull } from "react-icons/bi";
 
 interface MP3PlayerProps {
 	file: MP3File | null;
@@ -72,6 +74,11 @@ export const Player: React.FC<MP3PlayerProps> = ({
 	const currentFileIdRef = useRef<string | null>(null);
 	const preloadingRef = useRef<Set<string>>(new Set());
 	const shouldAutoPlayRef = useRef<boolean>(false);
+	const repeatModeRef = useRef<number>(0);
+
+	useEffect(() => {
+    repeatModeRef.current = repeatMode;
+	}, [repeatMode]);
 
 	useEffect(() => {
 		return () => {
@@ -150,11 +157,11 @@ export const Player: React.FC<MP3PlayerProps> = ({
 			};
 
 			const handleEnded = () => {
-				if (repeatMode === 0) {
+				if (repeatModeRef.current === 0) {
 					setIsPlaying(false);
 					shouldAutoPlayRef.current = true;
 					next?.(() => seek(0)); // Auto-advance to next track
-				} else if (repeatMode === 1) {					
+				} else if (repeatModeRef.current === 1) {					
 					seek(0);
 					play();
 				}
@@ -280,6 +287,10 @@ export const Player: React.FC<MP3PlayerProps> = ({
 		if (audioRef.current) {
 			audioRef.current.volume = newVolume;
 		}
+
+		audioElementCache.forEach(audio => {
+        audio.volume = newVolume;
+    });
 	};
 
 	const handleNext = () => {
@@ -365,11 +376,14 @@ export const Player: React.FC<MP3PlayerProps> = ({
 							value={currentTime}
 							onChange={(e) => seek(Number(e.target.value))}
 						/>
-						
 					</div>
 				</div>
 				<div className="cp-container">
+					<div className="c-space-taker">
+							a
+					</div>
 					<div className="controls">
+						
 						<button className="last" style={{visibility: 'hidden'}}>
 							{"."}
 						</button>
@@ -405,14 +419,26 @@ export const Player: React.FC<MP3PlayerProps> = ({
 							{"↻"}
 						</button>
 					</div>
+					<div className="volume-sec">
+						<div className="volume-bar-container">
+							<button className="volume-icon">
+								<IconContext.Provider value={{ color: "var(--text-color)" }}>
+									<BiSolidVolumeFull />
+								</IconContext.Provider>
+							</button>
+							<input 
+								type="range"
+								className="volume-bar"
+								value={volume * 100}
+								min="0"
+								max="100"
+								onChange={(e) => changeVolume(Number(e.target.value) / 100)}
+							/>
+						</div>
+					</div>
 				</div>
 			</div>
 
-			<div style={{ fontSize: '12px', opacity: 0.7, marginTop: '10px' }}>
-				Cache: {audioElementCache.size}/{MAX_CACHE_SIZE} | 
-				Preloading: {preloadingRef.current.size} | 
-				Ready: {audioRef.current?.readyState || 0}/4
-			</div>
 		</div>
 	);
 };

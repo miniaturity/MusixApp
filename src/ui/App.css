@@ -1,5 +1,24 @@
+:root {
+	--primary-color: #A6E3A1;
+	--darker-color: #9E9E9E;  
+	--background-color: #1E1E2E;
+	--hover-bg-color: #2a2a3fb2;
+	--text-color: #A6ADC8;
+	--secondary-text-color: #bcc4e4;
+}
+
 #root {
-    overflow: hidden;
-    max-width: 650px;
-    max-height: 650px;
+	overflow: hidden;
+	max-width: 650px;
+	max-height: 650px;
+}
+
+
+/* Navbar */
+.navbar {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	border: 1px cyan solid;
+	height: 8%;
 }

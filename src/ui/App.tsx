@@ -1,19 +1,12 @@
-import { useEffect, useState } from 'react'
-import { HashRouter as Router, Routes, Route } from 'react-router'
-import { MP3PlayerPage } from './pages/PlayerPage';
-import './App.css'
+import { HashRouter as Router } from "react-router";
+import AppContent from "./components/AppComponent";
 
 function App() {
-
   return (
-    <>
-      <Router>
-        <Routes>
-          <Route index element={<MP3PlayerPage />}/>
-        </Routes>
-      </Router>
-    </>
+    <Router>
+      <AppContent />
+    </Router>
   )
 }
 
-export default App
+export default App;
