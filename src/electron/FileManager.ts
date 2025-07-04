@@ -143,4 +143,5 @@ export class MP3Manager {
     }
     return file.albumArt;
   }
+  
 }

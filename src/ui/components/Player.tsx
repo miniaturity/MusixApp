@@ -2,8 +2,7 @@ import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { AlbumArt } from './AlbumArt';
 import { MiniQueue } from './MiniQueue';
 import { IconContext } from "react-icons"
-import { BiColor, BiColorFill, BiSolidVolumeFull } from "react-icons/bi";
-import { NavBar } from './Navbar';
+import { BiSolidVolumeFull, BiPlusCircle } from "react-icons/bi";
 
 interface MP3PlayerProps {
 	file: MP3File | null;
@@ -256,6 +255,7 @@ export const Player: React.FC<MP3PlayerProps> = ({
 			await audioRef.current.play();
 			setIsPlaying(true);
 		} catch (error) {
+			
 			console.error('Error playing audio:', error);
 		}
 	};
@@ -326,14 +326,35 @@ export const Player: React.FC<MP3PlayerProps> = ({
 		return folder.files.findIndex(f => f.id === file.id) + 1;
 	};
 
+	const now = new Date();
+	const formattedDateUS = new Intl.DateTimeFormat('en-US').format(now);
+	const formattedHours = String(now.getHours()).padStart(2, '0');
+	const formattedMinutes = String(now.getMinutes()).padStart(2, '0');
+	const formattedSeconds = String(now.getSeconds()).padStart(2, '0');
+	const nowTime = `${formattedHours}:${formattedMinutes}:${formattedSeconds}`;
+	const timedMessage = [
+		{
+			msg: "Good morning",
+			req: Number(formattedHours) < 12
+		},
+		{
+			msg: "Good afternoon",
+			req: Number(formattedHours) >= 12 && Number(formattedHours) < 18
+		},
+		{
+			msg: "Good evening",
+			req: Number(formattedHours) >= 18
+		}
+	]
 
-
+	const msg = timedMessage.find(item => item.req)?.msg || "Hello";
 
 	return (
 		<div className="player">
 			<div className="top">
 				<div className="track-info">
-					<div className="track-index">Track {(getCurrentIndex())} of {folder?.files.length || "0"}</div>
+					<div className="track-index">{msg}, {"Miniaturity"}!</div>
+					<div className="date">{formattedDateUS} {nowTime}</div>
 				</div>
 			</div>
 
@@ -343,10 +364,20 @@ export const Player: React.FC<MP3PlayerProps> = ({
 						fileId={file?.id || null}
 						alt={file?.filename || "none"}
 					/>
-
-					<div className="track-info-2">
-						<div className="track-title">{file?.title || (file?.filename && formatFileName(file?.filename)) || "[No Song Selected]"}</div>
-						<div className="track-author">{file?.artist || "[Unknown]"} {file?.album && `- ${file.album}`}</div>
+					<div className="track-info-2-container">
+						<div className="track-info-2">
+							<div className="track-title">{file?.title || (file?.filename && formatFileName(file?.filename)) || "[No Song Selected]"}</div>
+							<div className="track-author">{file?.artist || "[Unknown]"} {file?.album && `- ${file.album}`}</div>
+						</div>
+						<div className="add-to">
+							<button
+								className="playlist-button"
+							>
+								<IconContext.Provider value={{ color: 'var(--text-color)'}}>
+									<BiPlusCircle />
+								</IconContext.Provider>
+							</button>
+						</div>
 					</div>
 				</div>
 

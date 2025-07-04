@@ -1,10 +1,7 @@
-// src/ui/pages/MP3PlayerPage.tsx
 import React, { useEffect, useRef, useState } from 'react';
 import { Player } from '../components/Player';
 import './PlayerPage.css'
 import '../App.css'
-import { NavBar } from '../components/Navbar';
-
 
 export const MP3PlayerPage: React.FC = () => {
   const [mp3Folder, setMp3Folder] = useState<MP3Folder | null>(null);

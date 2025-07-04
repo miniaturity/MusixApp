@@ -26,9 +26,11 @@ export const NavBar: React.FC<NavBarProps> = ({
 					{buttons.map((button) => (<button 
 					className={`navbar-button${currentPath === button.nav ? '-current' : ''}`}
 					onClick={() => navigate(button.nav)}
+					key={button.icon}
 					>
 						{button.icon}
 					</button>))}
+					
 			</div>
 		</>
 	)

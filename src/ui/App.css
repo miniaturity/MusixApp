@@ -14,6 +14,14 @@
 	max-height: 650px;
 }
 
+.page {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  text-align: center;
+  color: var(--text-color);
+  height: 600px;
+}
 
 /* Navbar */
 .navbar {

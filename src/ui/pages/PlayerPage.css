@@ -28,16 +28,6 @@ body {
   margin: 8px 0 0 8px;
 }
 
-/* Page */
-.page {
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  text-align: center;
-  color: var(--text-color);
-  height: 600px;
-
-}
 
 /* =========== Player Page */
 .player {
@@ -148,15 +138,26 @@ body {
 }
 
 .top::before {
-  content: "Nav";
+  content: "Musix";
 }
 
 /* - Track Info */
 
 .track-info {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  justify-content: space-between;
   margin: 8px;
+}
+
+.date {
+  float: right;
+}
+
+.track-index {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 .track-info-2 {
@@ -165,6 +166,26 @@ body {
   text-align: left;
   width: 70%;
   margin: 8px;
+}
+
+.track-info-2-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.add-to {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+}
+
+.playlist-button {
+  background: transparent;
+  border: none;
+  cursor: pointer;  
 }
 
 .track-title, .track-author {
