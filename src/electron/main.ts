@@ -4,11 +4,8 @@ import { ipcMainHandle, isDev } from './util.js';
 import { getPreloadPath } from "./pathResolver.js";
 import { getStaticData, pollResources } from "./resourceManager.js";
 import { MP3Manager } from "./FileManager.js";
-import { fileURLToPath } from "url";
 
 const mp3Manager = new MP3Manager();
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 app.on("ready", () => {
     const mainWindow = new BrowserWindow({
@@ -19,10 +16,9 @@ app.on("ready", () => {
         width: 650,
         maxHeight: 650,
         maxWidth: 650,
-        resizable: false, 
-        maximizable: false, 
-        fullscreenable: false, 
-        icon: path.join(__dirname, '../../MusixApp/desktopIcon.png'), 
+        resizable: false,
+        frame: false,
+        titleBarStyle: 'hidden'
     });
     
     if (isDev()) {

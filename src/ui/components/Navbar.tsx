@@ -1,4 +1,8 @@
-import { useNavigate } from "react-router"
+import { useNavigate } from "react-router";
+import { BiCog, BiMusic, BiSolidPlaylist, BiEditAlt, BiHeadphone } from "react-icons/bi";
+import { ReactElement } from "react";
+import { IconContext } from "react-icons";
+import '../App.css'
 
 interface NavBarProps {
     currentPath: string
@@ -7,15 +11,32 @@ interface NavBarProps {
 export const NavBar: React.FC<NavBarProps> = ({
     currentPath
 }) => {
-	const buttons = [
+	interface ButtonsI {
+		icon: ReactElement;
+		nav: string;
+	}
+
+	const buttons: ButtonsI[] = [
 		{
-			icon: "♪",
+			icon: <IconContext.Provider value={{ color: 'var(--text-color)'}}><BiMusic /></IconContext.Provider>,
 			nav: "/"
 		},
 		{
-			icon: "◉",
-			nav: "/s"
-		}
+			icon: <IconContext.Provider value={{ color: 'var(--text-color)'}}><BiSolidPlaylist /></IconContext.Provider>,
+			nav: "/playlist"
+		},
+		{
+			icon: <IconContext.Provider value={{ color: 'var(--text-color)'}}><BiEditAlt /></IconContext.Provider>,
+			nav: "/edit"
+		},
+		{
+			icon: <IconContext.Provider value={{ color: 'var(--text-color)'}}><BiHeadphone /></IconContext.Provider>,
+			nav: "/stats"
+		},
+		{
+			icon: <IconContext.Provider value={{ color: 'var(--text-color)'}}><BiCog /></IconContext.Provider>,
+			nav: "/settings"
+		},
 	]
 	const navigate = useNavigate();
 
@@ -26,7 +47,7 @@ export const NavBar: React.FC<NavBarProps> = ({
 					{buttons.map((button) => (<button 
 					className={`navbar-button${currentPath === button.nav ? '-current' : ''}`}
 					onClick={() => navigate(button.nav)}
-					key={button.icon}
+					key={button.nav}
 					>
 						{button.icon}
 					</button>))}
