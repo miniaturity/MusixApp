@@ -315,6 +315,11 @@ export const Player: React.FC<MP3PlayerProps> = ({
 		return n.split('.')[0].slice(0, 30);
 	}
 
+	const formatArtist = (a: string | undefined): string | null => {
+		if (!a) return null;
+		return a.slice(0, 15);
+	}
+
 	const formatTime = (time: number): string => {
 		const minutes = Math.floor(time / 60);
 		const seconds = Math.floor(time % 60);
@@ -353,7 +358,7 @@ export const Player: React.FC<MP3PlayerProps> = ({
 		<div className="player">
 			<div className="top">
 				<div className="track-info">
-					<div className="track-index">{msg}, {"Miniaturity"}!</div>
+					<div className="track-index">{msg}, {"<user>"}!</div>
 					<div className="date">{formattedDateUS} {nowTime}</div>
 				</div>
 			</div>
@@ -367,7 +372,7 @@ export const Player: React.FC<MP3PlayerProps> = ({
 					<div className="track-info-2-container">
 						<div className="track-info-2">
 							<div className="track-title">{file?.title || (file?.filename && formatFileName(file?.filename)) || "[No Song Selected]"}</div>
-							<div className="track-author">{file?.artist || "[Unknown]"} {file?.album && `- ${file.album}`}</div>
+							<div className="track-author">{formatArtist(file?.artist) || "[Unknown]"} {file?.album && `- ${formatArtist(file.album)}`}</div>
 						</div>
 						<div className="add-to">
 							<button

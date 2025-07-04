@@ -17,8 +17,7 @@ app.on("ready", () => {
         maxHeight: 650,
         maxWidth: 650,
         resizable: false,
-        frame: false,
-        titleBarStyle: 'hidden'
+        icon: "desktopIcon.png"
     });
     
     if (isDev()) {

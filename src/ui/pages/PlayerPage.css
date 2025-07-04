@@ -19,7 +19,7 @@ body {
   margin: 8px 8px 8px 0;
 }
 
-.aa-img {
+.aa-img, .aa-loading {
   display: flex;
   width: 256px;
   height: 256px;
@@ -191,7 +191,7 @@ body {
 .track-title, .track-author {
   white-space: nowrap;
   text-overflow: ellipsis;
-  max-width: 100%;
+  max-width: 200px;
   overflow: hidden;
   text-align: left;
 }

@@ -2,7 +2,7 @@
     "appId": "com.r-alwi.musix",
     "files": ["dist-electron", "dist-react"],
     "extraResources": ["dist-electron/preload.cjs"],
-    "icon": "./desktopIcon.png",
+    "icon": "desktopIcon.png",
     "mac": {
         "target": "dmg"
     },
